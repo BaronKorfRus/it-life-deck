@@ -43,7 +43,7 @@
 </form>
 <script>
 // Сгенерировано scripts/build_site.py. Презентация лежит в deck.bin в зашифрованном виде.
-// #k=<ключ> в адресе — открыть без ввода пароля; #logout — забыть ключ на устройстве.
+// #k=<ключ> в адресе — открыть без ввода пароля (&s=N — сразу слайд N); #logout — забыть ключ на устройстве.
 (async function () {
   const SALT = 'HaVgwPkRJKhttPx4pFvc7A', ITER = 600000, STORE = 'it-life-deck-key';
   const $ = id => document.getElementById(id);
@@ -82,10 +82,12 @@
     document.close();
   }
 
+  // #k=<ключ>&s=<номер слайда> — открыть сразу нужный слайд
   const hash = location.hash;
   if (hash === '#logout') ls.del();
-  let candidate = hash.startsWith('#k=') ? hash.slice(3) : ls.get();
-  if (hash === '#logout' || hash.startsWith('#k=')) history.replaceState(null, '', location.pathname);
+  const m = hash.match(/^#k=([\w-]+)(?:&s=(\d+))?/);
+  let candidate = m ? m[1] : ls.get();
+  if (hash === '#logout' || m) history.replaceState(null, '', location.pathname + (m && m[2] ? '#' + m[2] : ''));
 
   if (candidate) {
     try { await unlock(await rawKey(candidate), true); return; }

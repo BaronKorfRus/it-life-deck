@@ -95,6 +95,12 @@
   }
 
   $('f').hidden = false;
+  // Без HTTPS (http://IP:порт) браузер не даёт Web Crypto — пароль проверить нечем.
+  if (!window.crypto || !crypto.subtle) {
+    $('go').disabled = true;
+    $('err').textContent = 'Откройте страницу по https:// — без защищённого соединения браузер не может расшифровать презентацию';
+    return;
+  }
   $('f').addEventListener('submit', async e => {
     e.preventDefault();
     $('go').disabled = true;
